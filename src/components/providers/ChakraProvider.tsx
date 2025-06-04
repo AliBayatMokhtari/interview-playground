@@ -1,4 +1,4 @@
-import { system } from "@/theme";
+import { system } from "@styles/theme";
 import { ChakraProvider as Provider } from "@chakra-ui/react";
 import { ThemeProvider } from "next-themes";
 import type { PropsWithChildren } from "react";

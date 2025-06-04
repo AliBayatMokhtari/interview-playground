@@ -1,5 +1,5 @@
 import { Card, Text, Flex } from "@chakra-ui/react";
-import Button from "../shared/Button";
+import Button from "@components/shared/Button";
 
 function AppHeader() {
   return (
