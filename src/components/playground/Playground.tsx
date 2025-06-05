@@ -15,7 +15,6 @@ function Playground() {
 
   const handleSizeChange = (sizes: number[]) => {
     const [left, right] = sizes;
-
     setPanes([left, right]);
   };
 
