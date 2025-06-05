@@ -1,13 +1,10 @@
 import ChakraProvider from "@components/providers/ChakraProvider";
-import AppHeader from "@components/header/AppHeader";
-import WelcomeMessage from "@components/welcome/WelcomeMessage";
+import DefaultLayout from "./layouts/DefaultLayout";
 
 function App() {
   return (
     <ChakraProvider>
-      <AppHeader />
-
-      <WelcomeMessage />
+      <DefaultLayout />
     </ChakraProvider>
   );
 }
