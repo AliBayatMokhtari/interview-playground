@@ -1,10 +1,9 @@
 import { useState } from "react";
+import { isObject } from "src/utils/object";
 
 export enum StorageKey {
   playgroundPanes = "playground-panes",
 }
-
-const isObject = <T>(value: T) => typeof value === "object";
 
 function useStorageValue<T>(key: StorageKey, defaultValue: T) {
   const [state, setState] = useState<T>(() => {
