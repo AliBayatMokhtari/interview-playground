@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { Allotment } from "allotment";
-import useStorageValue, { StorageKey } from "src/hooks/useStorageValue";
+import useStorageValue from "src/hooks/useStorageValue";
+import { StorageKey } from "src/config/StorageKey";
 
 // @ts-expect-error
 import "allotment/dist/style.css";

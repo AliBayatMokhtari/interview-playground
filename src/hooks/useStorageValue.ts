@@ -1,9 +1,6 @@
 import { useState } from "react";
+import { StorageKey } from "src/config/StorageKey";
 import { isObject } from "src/utils/object";
-
-export enum StorageKey {
-  playgroundPanes = "playground-panes",
-}
 
 function useStorageValue<T>(key: StorageKey, defaultValue: T) {
   const [state, setState] = useState<T>(() => {
