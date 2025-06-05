@@ -1,9 +1,9 @@
 import { Box } from "@chakra-ui/react";
 import { Allotment } from "allotment";
+import useStorageValue, { StorageKey } from "src/hooks/useStorageValue";
 
 // @ts-expect-error
 import "allotment/dist/style.css";
-import useStorageValue, { StorageKey } from "src/hooks/useStorageValue";
 
 type PaneSize = string | number;
 
