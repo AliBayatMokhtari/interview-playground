@@ -29,5 +29,5 @@
       "@styles/*": ["src/styles/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "./vite.d.ts"]
 }
