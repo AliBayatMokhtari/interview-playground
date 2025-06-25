@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { Allotment } from "allotment";
 import useStorageValue from "src/hooks/useStorageValue";
 import { StorageKey } from "src/config/StorageKey";
@@ -14,7 +14,6 @@ const pwc = new PlaygroundWebContainer(new WebContainer());
 
 function Playground() {
   const [showPlayground, setShowPlayground] = useState(false);
-  const [mounting, setMounting] = useState(false);
   const [[left, right], setPanes] = useStorageValue<[PaneSize, PaneSize]>(
     StorageKey.playgroundPanes,
     ["50%", "50%"]
@@ -27,27 +26,24 @@ function Playground() {
 
   useEffect(() => {
     if (!pwc.isBooting && !pwc.isReady) {
-      pwc
-        .boot()
-        .then(() => setShowPlayground(true))
-        .then(() => {
-          setMounting(true);
-          const modules = import.meta.glob("./task_1/*.ts", {
-            eager: true,
-            as: "raw",
-          });
-
-          const files = Object.keys(modules).reduce((tree, filePath) => {
-            const splitted = filePath.split("/");
-            const fileName = splitted[splitted.length - 1];
-            tree[fileName] = modules[filePath];
-            return tree;
-          }, {} as Record<string, string>);
-
-          pwc.mount(files).then(() => {
-            setMounting(false);
-          });
+      setShowPlayground(true);
+      pwc.boot().then(() => {
+        const modules = import.meta.glob("./task_1/*.ts", {
+          eager: true,
+          as: "raw",
         });
+
+        const files = Object.keys(modules).reduce((tree, filePath) => {
+          const splitted = filePath.split("/");
+          const fileName = splitted[splitted.length - 1];
+          tree[fileName] = modules[filePath];
+          return tree;
+        }, {} as Record<string, string>);
+
+        pwc.mount(files).then(() => {
+          setShowPlayground(false);
+        });
+      });
     }
   }, []);
 
@@ -57,8 +53,13 @@ function Playground() {
         <Box p={2}>Pane 1</Box>
       </Allotment.Pane>
       <Allotment.Pane minSize={400} preferredSize={right}>
-        <Box p={2}>Pane 2 - {JSON.stringify(showPlayground)}</Box>
-        {mounting && <Box>Mounting Files...</Box>}
+        <Box p={2}>Pane 2</Box>
+        {showPlayground && (
+          <Flex p={2} gap={2} alignItems="center">
+            <Spinner />
+            <Text>Working On It</Text>
+          </Flex>
+        )}
       </Allotment.Pane>
     </Allotment>
   );
