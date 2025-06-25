@@ -14,6 +14,7 @@ const pwc = new PlaygroundWebContainer(new WebContainer());
 
 function Playground() {
   const [showPlayground, setShowPlayground] = useState(false);
+  const [mounting, setMounting] = useState(false);
   const [[left, right], setPanes] = useStorageValue<[PaneSize, PaneSize]>(
     StorageKey.playgroundPanes,
     ["50%", "50%"]
@@ -26,7 +27,27 @@ function Playground() {
 
   useEffect(() => {
     if (!pwc.isBooting && !pwc.isReady) {
-      pwc.boot().then(() => setShowPlayground(true));
+      pwc
+        .boot()
+        .then(() => setShowPlayground(true))
+        .then(() => {
+          setMounting(true);
+          const modules = import.meta.glob("./task_1/*.ts", {
+            eager: true,
+            as: "raw",
+          });
+
+          const files = Object.keys(modules).reduce((tree, filePath) => {
+            const splitted = filePath.split("/");
+            const fileName = splitted[splitted.length - 1];
+            tree[fileName] = modules[filePath];
+            return tree;
+          }, {} as Record<string, string>);
+
+          pwc.mount(files).then(() => {
+            setMounting(false);
+          });
+        });
     }
   }, []);
 
@@ -37,6 +58,7 @@ function Playground() {
       </Allotment.Pane>
       <Allotment.Pane minSize={400} preferredSize={right}>
         <Box p={2}>Pane 2 - {JSON.stringify(showPlayground)}</Box>
+        {mounting && <Box>Mounting Files...</Box>}
       </Allotment.Pane>
     </Allotment>
   );
