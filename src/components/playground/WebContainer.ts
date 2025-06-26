@@ -37,8 +37,6 @@ class PlaygroundWebContainer {
         {} as FileSystemTree
       );
 
-      console.log(fileSystemTree);
-
       this.webContainer.mount(fileSystemTree);
     } catch {
       this.hasError = true;
