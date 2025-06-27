@@ -1,49 +1,26 @@
-import { useEffect, useState } from "react";
 import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { Allotment } from "allotment";
 import useStorageValue from "src/hooks/useStorageValue";
 import { StorageKey } from "src/config/StorageKey";
-import useWebContainer from "src/stores/webContainer";
+import usePlayground from "src/hooks/usePlayground";
 
 import "allotment/dist/style.css";
-import { VirtualFile } from "src/structures/VirtualFile";
+import { PlaygroundStatus } from "src/types/Playground";
 
 type PaneSize = string | number;
 
 function Playground() {
-  const [showPlayground, setShowPlayground] = useState(false);
   const [[left, right], setPanes] = useStorageValue<[PaneSize, PaneSize]>(
     StorageKey.playgroundPanes,
     ["50%", "50%"]
   );
 
-  const { wc, isBooted, boot } = useWebContainer();
+  const { status } = usePlayground();
 
   const handleSizeChange = (sizes: number[]) => {
     const [left, right] = sizes;
     setPanes([left, right]);
   };
-
-  useEffect(() => {
-    const warmUpWC = async () => {
-      if (!isBooted && !wc) {
-        setShowPlayground(true);
-        await boot();
-        setShowPlayground(false);
-      } else if (wc) {
-        const rawFiles = import.meta.glob("../../.templates/**/*", {
-          eager: true,
-          as: "raw",
-        });
-        const files = Object.entries(rawFiles).map(
-          ([path, content]) => new VirtualFile(path, content, wc)
-        );
-        console.log({ files });
-      }
-    };
-
-    warmUpWC();
-  }, [wc]);
 
   return (
     <Allotment onDragEnd={handleSizeChange}>
@@ -52,10 +29,10 @@ function Playground() {
       </Allotment.Pane>
       <Allotment.Pane minSize={400} preferredSize={right}>
         <Box p={2}>Pane 2</Box>
-        {showPlayground && (
+        {status !== PlaygroundStatus.READY && (
           <Flex p={2} gap={2} alignItems="center">
             <Spinner />
-            <Text>Working On It</Text>
+            <Text>{status.capitalizeFirstLetter()}</Text>
           </Flex>
         )}
       </Allotment.Pane>
