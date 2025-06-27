@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useWebContainer from "src/stores/webContainer";
 import { VirtualFile } from "src/structures/VirtualFile";
 import { PlaygroundStatus } from "src/types/Playground";
+import { filesToWebContainerFs } from "src/utils/playground";
 
 export default function usePlayground() {
   const { wc, boot, isBooted } = useWebContainer();
@@ -9,13 +10,17 @@ export default function usePlayground() {
     PlaygroundStatus.BOOTING
   );
 
-  const mountFiles = useCallback((files: VirtualFile[]) => {
+  const mountFiles = async (files: VirtualFile[]) => {
+    if (!wc) return;
+
+    const wcFsTree = filesToWebContainerFs(files);
+
+    console.log(wcFsTree);
+
     setStatus(PlaygroundStatus.MOUNTING);
-    console.log(files);
-    setTimeout(() => {
-      setStatus(PlaygroundStatus.INSTALLING);
-    }, 2000);
-  }, []);
+    await wc.mount(filesToWebContainerFs(files));
+    setStatus(PlaygroundStatus.INSTALLING);
+  };
 
   useEffect(() => {
     const warmUpWC = async () => {
@@ -29,7 +34,7 @@ export default function usePlayground() {
         const files = Object.entries(rawFiles).map(
           ([path, content]) => new VirtualFile(path, content, wc)
         );
-        mountFiles(files);
+        await mountFiles(files);
       }
     };
 
