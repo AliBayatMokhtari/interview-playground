@@ -3,14 +3,12 @@ import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import { Allotment } from "allotment";
 import useStorageValue from "src/hooks/useStorageValue";
 import { StorageKey } from "src/config/StorageKey";
-import PlaygroundWebContainer from "./WebContainer";
-import { WebContainer } from "@webcontainer/api";
+import useWebContainer from "src/stores/webContainer";
 
 import "allotment/dist/style.css";
+import { VirtualFile } from "src/structures/VirtualFile";
 
 type PaneSize = string | number;
-
-const pwc = new PlaygroundWebContainer(new WebContainer());
 
 function Playground() {
   const [showPlayground, setShowPlayground] = useState(false);
@@ -19,33 +17,33 @@ function Playground() {
     ["50%", "50%"]
   );
 
+  const { wc, isBooted, boot } = useWebContainer();
+
   const handleSizeChange = (sizes: number[]) => {
     const [left, right] = sizes;
     setPanes([left, right]);
   };
 
   useEffect(() => {
-    if (!pwc.isBooting && !pwc.isReady) {
-      setShowPlayground(true);
-      pwc.boot().then(() => {
-        const modules = import.meta.glob("./task_1/*.ts", {
+    const warmUpWC = async () => {
+      if (!isBooted && !wc) {
+        setShowPlayground(true);
+        await boot();
+        setShowPlayground(false);
+      } else if (wc) {
+        const rawFiles = import.meta.glob("../../.templates/**/*", {
           eager: true,
           as: "raw",
         });
+        const files = Object.entries(rawFiles).map(
+          ([path, content]) => new VirtualFile(path, content, wc)
+        );
+        console.log({ files });
+      }
+    };
 
-        const files = Object.keys(modules).reduce((tree, filePath) => {
-          const splitted = filePath.split("/");
-          const fileName = splitted[splitted.length - 1];
-          tree[fileName] = modules[filePath];
-          return tree;
-        }, {} as Record<string, string>);
-
-        pwc.mount(files).then(() => {
-          setShowPlayground(false);
-        });
-      });
-    }
-  }, []);
+    warmUpWC();
+  }, [wc]);
 
   return (
     <Allotment onDragEnd={handleSizeChange}>

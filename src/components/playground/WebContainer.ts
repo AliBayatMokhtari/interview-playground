@@ -22,22 +22,9 @@ class PlaygroundWebContainer {
     }
   };
 
-  mount = async (files: Record<string, string>) => {
+  mount = async (fsTree: FileSystemTree) => {
     try {
-      const fileNames = Object.keys(files);
-      const fileSystemTree: FileSystemTree = fileNames.reduce(
-        (fsTree, fileName) => {
-          fsTree[fileName] = {
-            file: {
-              contents: files[fileName],
-            },
-          };
-          return fsTree;
-        },
-        {} as FileSystemTree
-      );
-
-      this.webContainer.mount(fileSystemTree);
+      this.webContainer.mount(fsTree);
     } catch {
       this.hasError = true;
     }
