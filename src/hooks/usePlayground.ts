@@ -14,11 +14,8 @@ export default function usePlayground() {
     if (!wc) return;
 
     const wcFsTree = filesToWebContainerFs(files);
-
-    console.log(wcFsTree);
-
     setStatus(PlaygroundStatus.MOUNTING);
-    await wc.mount(filesToWebContainerFs(files));
+    await wc.mount(wcFsTree);
     setStatus(PlaygroundStatus.INSTALLING);
   };
 
@@ -27,10 +24,14 @@ export default function usePlayground() {
       if (!isBooted && !wc) {
         await boot();
       } else if (wc) {
-        const rawFiles = import.meta.glob("../.templates/**/*", {
-          eager: true,
-          as: "raw",
-        });
+        const rawFiles: Record<string, string> = import.meta.glob(
+          "../.templates/**/*",
+          {
+            eager: true,
+            query: "?raw",
+            import: "default",
+          }
+        );
         const files = Object.entries(rawFiles).map(
           ([path, content]) => new VirtualFile(path, content, wc)
         );
