@@ -8,6 +8,10 @@ const customConfig = defineConfig({
     "#app": {
       height: "100vh",
     },
+
+    ".xterm-viewport": {
+      overflowY: "auto !important",
+    },
   },
 });
 
