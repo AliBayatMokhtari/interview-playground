@@ -10,9 +10,10 @@ export function filesToWebContainerFs(files: VirtualFile[]) {
     if (!isDirectory(file.filepath)) {
       tree[file.filepath] = file.toNode();
     } else {
-      const parts = file.filepath.split("/");
+      let parts = file.filepath.split("/");
       const filename = parts.pop()!;
       let current = tree;
+      parts = parts.filter((part) => part !== ".." && part !== ".");
       for (const dir of parts) {
         if (!current[dir]) {
           current[dir] = { directory: {} };
@@ -36,9 +37,10 @@ export function filesToVirtualFsTree(files: VirtualFile[]) {
     if (!isDirectory(file.filepath)) {
       tree[file.filepath] = { file };
     } else {
-      const parts = file.filepath.split("/");
+      let parts = file.filepath.split("/");
       const filename = parts.pop()!;
       let current = tree;
+      parts = parts.filter((part) => part !== ".." && part !== ".");
       for (const dir of parts) {
         if (!current[dir]) {
           current[dir] = { directory: {} };

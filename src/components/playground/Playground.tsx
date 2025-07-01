@@ -15,7 +15,7 @@ function Playground() {
     ["50%", "50%"]
   );
 
-  const { status } = usePlayground();
+  const { url, status } = usePlayground();
 
   const handleSizeChange = (sizes: number[]) => {
     const [left, right] = sizes;
@@ -35,6 +35,7 @@ function Playground() {
             <Text>{status.capitalizeFirstLetter()}</Text>
           </Flex>
         )}
+        {url && <iframe src={url} width="100%" height={400} />}
       </Allotment.Pane>
     </Allotment>
   );

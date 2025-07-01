@@ -1,22 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useWebContainer from "src/stores/webContainer";
 import { VirtualFile } from "src/structures/VirtualFile";
-import { PlaygroundStatus } from "src/types/Playground";
 import { filesToWebContainerFs } from "src/utils/playground";
 
 export default function usePlayground() {
-  const { wc, boot, isBooted } = useWebContainer();
-  const [status, setStatus] = useState<PlaygroundStatus>(
-    PlaygroundStatus.BOOTING
-  );
+  const {
+    wc,
+    url,
+    isBooted,
+    status,
+    boot,
+    mount,
+    runDevServer,
+    setupListeners,
+    installDependencies,
+  } = useWebContainer();
 
   const mountFiles = async (files: VirtualFile[]) => {
-    if (!wc) return;
-
+    if (!wc) {
+      return;
+    }
     const wcFsTree = filesToWebContainerFs(files);
-    setStatus(PlaygroundStatus.MOUNTING);
-    await wc.mount(wcFsTree);
-    setStatus(PlaygroundStatus.INSTALLING);
+    mount(wcFsTree);
   };
 
   useEffect(() => {
@@ -25,17 +30,21 @@ export default function usePlayground() {
         await boot();
       } else if (wc) {
         const rawFiles: Record<string, string> = import.meta.glob(
-          "../.templates/**/*",
+          ["../.templates/**/*", "!../.templates/node_modules/**"],
           {
             eager: true,
             query: "?raw",
             import: "default",
           }
         );
-        const files = Object.entries(rawFiles).map(
-          ([path, content]) => new VirtualFile(path, content, wc)
-        );
+        const files = Object.entries(rawFiles).map(([path, content]) => {
+          const _path = path.replace("../.templates/", "");
+          return new VirtualFile(_path, content, wc);
+        });
         await mountFiles(files);
+        await installDependencies();
+        await runDevServer();
+        setupListeners();
       }
     };
 
@@ -43,6 +52,7 @@ export default function usePlayground() {
   }, [wc, isBooted]);
 
   return {
+    url,
     status,
   };
 }
