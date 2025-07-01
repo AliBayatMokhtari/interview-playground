@@ -48,7 +48,7 @@ const useWebContainer = create<WebContainerStore>()((set, get) => ({
     const wc = get().wc;
     if (wc) {
       set({ status: PlaygroundStatus.INSTALLING });
-      const installProcess = await wc.spawn("pnpm", ["install"]);
+      const installProcess = await wc.spawn("npm", ["install"]);
 
       installProcess.output.pipeTo(
         new WritableStream({
@@ -67,7 +67,7 @@ const useWebContainer = create<WebContainerStore>()((set, get) => ({
     const wc = get().wc;
     if (wc) {
       set({ status: PlaygroundStatus.STARTING });
-      await wc.spawn("pnpm", ["start"]);
+      await wc.spawn("npm", ["start"]);
       set({ status: PlaygroundStatus.READY });
     }
   },
