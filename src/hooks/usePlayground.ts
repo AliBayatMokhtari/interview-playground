@@ -46,7 +46,7 @@ export default function usePlayground() {
       return;
     }
     setStatus(PlaygroundStatus.INSTALLING);
-    const installProcess = await wc.spawn("npm", ["install"]);
+    const installProcess = await wc.spawn("pnpm", ["install"]);
 
     installProcess.output.pipeTo(
       new WritableStream({
@@ -69,7 +69,7 @@ export default function usePlayground() {
       return;
     }
     setStatus(PlaygroundStatus.STARTING);
-    await wc.spawn("npm", ["start"]);
+    await wc.spawn("pnpm", ["start"]);
     setStatus(PlaygroundStatus.READY);
   };
 
