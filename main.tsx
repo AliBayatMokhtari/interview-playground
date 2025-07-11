@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./src/Application";
+import App from "./src/App";
 import "./src/utils/boot";
 
 const app = document.getElementById("app")!;
