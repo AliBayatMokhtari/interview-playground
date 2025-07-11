@@ -6,6 +6,7 @@ import usePlayground from "src/hooks/usePlayground";
 import { PlaygroundStatus } from "src/types/Playground";
 
 import "allotment/dist/style.css";
+import PlaygroundPreview from "./Preview";
 
 type PaneSize = string | number;
 
@@ -15,7 +16,7 @@ function Playground() {
     ["50%", "50%"]
   );
 
-  const { url, status, terminalEl } = usePlayground();
+  const { status, terminalEl } = usePlayground();
 
   const handleSizeChange = (sizes: number[]) => {
     const [left, right] = sizes;
@@ -30,7 +31,7 @@ function Playground() {
       <Allotment.Pane minSize={400} preferredSize={right}>
         <Allotment vertical>
           <Allotment.Pane>
-            <iframe src={url ?? ""} width="100%" height="100%" />
+            <PlaygroundPreview />
           </Allotment.Pane>
           <Allotment.Pane>
             <Box ref={terminalEl} height="100%" px={3} />
